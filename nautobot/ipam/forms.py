@@ -239,6 +239,7 @@ class RIRFilterForm(BootstrapMixin, CustomFieldFilterForm):
 
 
 class AggregateForm(BootstrapMixin, TenancyForm, PrefixFieldMixin, CustomFieldModelForm, RelationshipModelForm):
+    prefix = IPNetworkFormField()
     rir = DynamicModelChoiceField(queryset=RIR.objects.all(), label="RIR")
     tags = DynamicModelMultipleChoiceField(queryset=Tag.objects.all(), required=False)
 
@@ -260,6 +261,13 @@ class AggregateForm(BootstrapMixin, TenancyForm, PrefixFieldMixin, CustomFieldMo
         widgets = {
             "date_added": DatePicker(),
         }
+
+    def clean(self):
+        super().clean()
+
+        # Due to prefix not being in the table and a computed field
+        # set on instance for Model.clean()
+        self.instance.prefix = self.cleaned_data.get("prefix")
 
 
 class AggregateCSVForm(PrefixFieldMixin, CustomFieldModelCSVForm):
@@ -343,6 +351,7 @@ class RoleCSVForm(CustomFieldModelCSVForm):
 
 
 class PrefixForm(PrefixFieldMixin, BootstrapMixin, TenancyForm, CustomFieldModelForm, RelationshipModelForm):
+    prefix = IPNetworkFormField()
     vrf = DynamicModelChoiceField(
         queryset=VRF.objects.all(),
         required=False,
@@ -398,6 +407,13 @@ class PrefixForm(PrefixFieldMixin, BootstrapMixin, TenancyForm, CustomFieldModel
         super().__init__(*args, **kwargs)
 
         self.fields["vrf"].empty_label = "Global"
+
+    def clean(self):
+        super().clean()
+
+        # Due to prefix not being in the table and a computed field
+        # set on instance for Model.clean()
+        self.instance.prefix = self.cleaned_data.get("prefix")
 
 
 class PrefixCSVForm(PrefixFieldMixin, StatusModelCSVFormMixin, CustomFieldModelCSVForm):

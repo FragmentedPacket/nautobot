@@ -283,10 +283,6 @@ class Aggregate(PrimaryModel):
             # Clear host bits from prefix
             self.prefix = self.prefix.cidr
 
-            # /0 masks are not acceptable
-            if self.prefix.prefixlen == 0:
-                raise ValidationError({"prefix": "Cannot create aggregate with /0 mask."})
-
             # Ensure that the aggregate being added is not covered by an existing aggregate
             covering_aggregates = Aggregate.objects.net_contains_or_equals(self.prefix)
             if self.present_in_database:
@@ -537,10 +533,6 @@ class Prefix(PrimaryModel, StatusModel):
         super().clean()
 
         if self.prefix:
-
-            # /0 masks are not acceptable
-            if self.prefix.prefixlen == 0:
-                raise ValidationError({"prefix": "Cannot create prefix with /0 mask."})
 
             # Disallow host masks
             if self.prefix.version == 4 and self.prefix.prefixlen == 32:

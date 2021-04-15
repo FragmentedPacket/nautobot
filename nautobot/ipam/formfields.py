@@ -44,7 +44,7 @@ class IPNetworkFormField(forms.Field):
         "invalid": "Enter a valid IPv4 or IPv6 address (with CIDR mask).",
     }
 
-    def __init__(self, allow_zero_prefix=True, *args, **kwargs):
+    def __init__(self, allow_zero_prefix=False, *args, **kwargs):
         """Initialize any arguments that will be used for field validation.
 
         Args:
