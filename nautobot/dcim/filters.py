@@ -755,12 +755,14 @@ class DeviceFilterSet(
     def search(self, queryset, name, value):
         if not value.strip():
             return queryset
+        lookup_expr = "regex" if value.startswith("~") else "icontains"
+        value = value.strip("~")
         return queryset.filter(
-            Q(name__icontains=value)
-            | Q(serial__icontains=value.strip())
-            | Q(inventoryitems__serial__icontains=value.strip())
-            | Q(asset_tag__icontains=value.strip())
-            | Q(comments__icontains=value)
+            Q(**{f"name__{lookup_expr}": value})
+            | Q(**{f"serial__{lookup_expr}": value.strip()})
+            | Q(**{f"inventoryitems__serial__{lookup_expr}": value.strip()})
+            | Q(**{f"asset_tag__{lookup_expr}": value.strip()})
+            | Q(**{f"comments__{lookup_expr}": value})
         ).distinct()
 
     def _has_primary_ip(self, queryset, name, value):
